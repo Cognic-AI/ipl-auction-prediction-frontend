@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Search, Filter, Star, TrendingUp, TrendingDown, Activity } from "lucide-react"
 import { SidebarLayout } from "@/components/sidebar-layout"
 import { PlayerStatsChart } from "@/components/player-stats-chart"
+import { useRouter } from "next/navigation"
 
 const players = [
   {
@@ -157,7 +158,7 @@ export default function PlayersPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedPlayer, setSelectedPlayer] = useState<(typeof players)[0] | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const router = useRouter();
   const filteredPlayers = players.filter(
     (player) =>
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -166,8 +167,7 @@ export default function PlayersPage() {
   )
 
   const handlePlayerClick = (player: (typeof players)[0]) => {
-    setSelectedPlayer(player)
-    setIsModalOpen(true)
+    router.push(`/players/${player.id}`)
   }
 
   return (
@@ -276,100 +276,6 @@ export default function PlayersPage() {
           </div>
         </motion.div>
       </main>
-
-      {/* Player Details Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          {selectedPlayer && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={selectedPlayer.avatar || "/placeholder.svg"} alt={selectedPlayer.name} />
-                    <AvatarFallback>
-                      {selectedPlayer.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-2xl font-bold">{selectedPlayer.name}</h2>
-                    <p className="text-muted-foreground">
-                      {selectedPlayer.team} • {selectedPlayer.position}
-                    </p>
-                  </div>
-                </DialogTitle>
-                <DialogDescription>Detailed statistics and performance analysis</DialogDescription>
-              </DialogHeader>
-
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Stats Overview */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Activity className="h-5 w-5" />
-                    Season Statistics
-                  </h3>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                      <CardContent className="p-4 text-center">
-                        <p className="text-2xl font-bold text-green-600">{selectedPlayer.stats.goals}</p>
-                        <p className="text-sm text-muted-foreground">Goals</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="p-4 text-center">
-                        <p className="text-2xl font-bold text-blue-600">{selectedPlayer.stats.assists}</p>
-                        <p className="text-sm text-muted-foreground">Assists</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="p-4 text-center">
-                        <p className="text-2xl font-bold">{selectedPlayer.stats.matches}</p>
-                        <p className="text-sm text-muted-foreground">Matches</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="p-4 text-center">
-                        <p className="text-2xl font-bold text-yellow-600">{selectedPlayer.stats.rating}</p>
-                        <p className="text-sm text-muted-foreground">Rating</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                    <div>
-                      <p className="font-semibold">Current Price</p>
-                      <p className="text-2xl font-bold text-green-600">${selectedPlayer.price}M</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">Total Points</p>
-                      <p className="text-2xl font-bold text-blue-600">{selectedPlayer.points}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Performance Chart */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Points Over Time</h3>
-                  <PlayerStatsChart data={selectedPlayer.stats.chartData} />
-                </div>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <Button className="flex-1">
-                  <Star className="mr-2 h-4 w-4" />
-                  Add to Watchlist
-                </Button>
-                <Button variant="outline" className="flex-1">
-                  Add to Team
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </SidebarLayout>
   )
 }
